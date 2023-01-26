@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        #header {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-evenly;
+
+            width: 100vw;
+            height: 100px;
+            background-color: darkgreen;
+        }
+
+        #header>div {
+            margin: 0.5em;
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+            font-size: larger;
+            color: #62d662
+        }
+
+    </style>
+
+</head>
+
+<body>
+    <div id="header">
+        <div id="status">STATUS</div>
+        <div id="logowanie">
+            <p>LOGOWANIE: </p>
+            <input type="text" id="tbLogin">
+            <input type="button" id="btnLogin" value="login">
+            <input type="button" id="btnReset" value="reset">
+        </div>
+    </div>
+    <div id="root"></div>
+
+    <script type="text/javascript" src="libs/three145.js"></script>
+
+    <script src="js/Game.js"></script>
+    <script src="js/Net.js"></script>
+    <script src="js/Ui.js"></script>
+
+    <script src="js/Main.js"></script>
+</body>
+
+</html>
