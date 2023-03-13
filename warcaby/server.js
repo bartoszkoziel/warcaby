@@ -1,36 +1,43 @@
 const express = require("express")
 const app = express()
-const path = require("path")
+
+var users = []
 
 app.use(express.json())
+app.post("/handleLogin", (req, res) => {
+    console.log("REQ.BODY", req.body)
 
-var players = []
+    if (users.length == 0) {
 
-app.post("/handleLogin", function (req, res) {
-    console.log(req.body)
+        users.push(req.body)
+        console.log("ADDED FIRST USER: ", users)
+        res.setHeader('content-type', 'application/json')
+        res.end(JSON.stringify({ status: "USER_JOINED" }))
 
-    if (players.length < 2) {
-        let color = ""
-        if (players.length == 1) {
-            color = "black"
-        } else if (players.length == 0) {
-            color = "white"
-        }
+    } else if (users.length == 1 && users[0].login != req.body.login) {
 
-        let player = {
-            login: req.body.login,
-            color: color
-        }
-        players.push(player)
-        console.log(players);
+        users.push(req.body)
+        console.log("ADDED SECOND USER: ", users)
+        res.setHeader('content-type', 'application/json')
+        res.end(JSON.stringify({ status: "USER_JOINED" }))
+
+    } else if (users.length >= 2) {
+
+        console.log("TO MANY USERS: ", users)
+        res.setHeader('content-type', 'application/json')
+        res.end(JSON.stringify({ status: "MAX_USERS" }))
+
+    } else if (users[0].login == req.body.login) {
+
+        console.log("USER ALREADY EXISTS: ", users)
+        res.setHeader('content-type', 'application/json')
+        res.end(JSON.stringify({ status: "USER_ALREADY_EXISTS" }))
     }
 })
 
-app.post("/handleCheckIfReady", function (req, res) {
+app.post("/handleUserCheck", (req, res) => {
     res.setHeader('content-type', 'application/json')
-    if (players.length == 1) res.end(JSON.stringify({ ready: false }))
-    if (players.length == 2) res.end(JSON.stringify({ ready: true }))
-
+    res.end(JSON.stringify(users))
 })
 
 app.use(express.static('static'))

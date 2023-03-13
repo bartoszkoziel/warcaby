@@ -1,30 +1,31 @@
 class Net {
     constructor() {
-
+        console.log("Net.js")
     }
 
-    btnLoginClick() {
+    btnLoginFetch() {
+        let login = document.getElementById("tbLogin").value
+        console.log("LOGIN : ", login)
 
-        const body = JSON.stringify({ login: ui.tbLogin.value })
+        const body = JSON.stringify({ login: login })
 
-        const headers = { "Content-Type": "application/json" } // nagłowek czyli typ danych
+        const headers = { "Content-Type": "application/json" }
 
-        fetch("/handleLogin", { method: "post", body, headers }) // fetch
-            .then(
-                game.createPieces(),
-                console.log("cos")
-            )
+        return fetch("/handleLogin", { method: "post", body, headers })
+            .then(response => response.json())
+            .then(data => {
+                return data.status
+            })
     }
 
-    checkIfReady() {
-        const body = JSON.stringify({})
+    userCheck() {
+        const body = JSON.stringify({ a: 1 })
+        const headers = { "Content-Type": "application/json" }
 
-        const headers = { "Content-Type": "application/json" } // nagłowek czyli typ danych
-
-        fetch("/handleCheckIfReady", { method: "post", body, headers }) // fetch
-            .then(
-                game.createPieces(),
-                console.log("cos")
-            )
+        return fetch("/handleUserCheck", { method: "post", body, headers })
+            .then((response) => response.json())
+            .then((data) => {
+                return data
+            })
     }
 }

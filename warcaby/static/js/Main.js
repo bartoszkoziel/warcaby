@@ -1,4 +1,3 @@
-
 let game;
 let net;
 let ui;
