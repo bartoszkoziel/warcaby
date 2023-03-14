@@ -1,6 +1,18 @@
 class Net {
     constructor() {
         console.log("Net.js")
+
+        socket.on("nextPlayer", (msg) => {
+            console.log(msg)
+            game.pionki = msg
+            game.updateBoard()
+
+            if (game.token == true) {
+                game.token = false
+            } else if (game.token == false) {
+                game.token = true
+            }
+        })
     }
 
     btnLoginFetch() {
@@ -27,5 +39,9 @@ class Net {
             .then((data) => {
                 return data
             })
+    }
+
+    emitMove(pionki) {
+        socket.emit("emitMove", pionki)
     }
 }

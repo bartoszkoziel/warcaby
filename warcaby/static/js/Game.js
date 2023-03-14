@@ -7,6 +7,7 @@ class Game {
         this.piecesColor = ""
 
         this.chosenPiece = ""
+        this.token = ""
 
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.1, 10000);
@@ -63,7 +64,7 @@ class Game {
         ]
 
         // biale - 1
-        // czarne (czerwone) - 2
+        // czerwone - 2
         // puste - 0 (wraz z bialymi polami)
         this.pionki = [
 
@@ -89,30 +90,34 @@ class Game {
             this.mouseVector1.y = -(e.clientY / window.innerHeight) * 2 + 1
             this.raycaster1.setFromCamera(this.mouseVector1, this.camera)
             const intersects = this.raycaster1.intersectObjects(this.scene.children)
-            if (intersects.length > 0) {
+            if (intersects.length > 0 && this.token == true) {
 
                 let name = intersects[0].object.name
                 console.log(intersects[0].object);
 
                 // KLIK W SWOJEGO PIONKA 
                 if (name.split('_')[0] == this.piecesColor) {
-                    console.log("___ZAZNACZONO ODPOWIEDNI KOLOR PIONKOW!!!___ ", name)
-
                     this.choose(name)
 
-                    console.log(this.chosenPiece)
-                    let currentPiece = this.scene.getObjectByName(name)
-
+                    console.log("EBEBEBBEE: ", name)
+                    console.log("EBEBEBEBE: ", this.chosenPiece)
                 }
 
-                // KLIK W DOWOLNE POLE
+                // KLIK W POLE Z ZAZNACZONYM PIONKIEM
                 if (name.split('_')[0] == "tile" && this.chosenPiece != "") {
                     console.log("KLIK W POLE : ", name)
                     console.log("RUCH " + this.chosenPiece + "NA POLE : ", name)
 
-                    this.move(this.chosenPiece, name)
-                    this.choose(-1)
+                    if (this.checkMove(this.chosenPiece, name) == true) {
+                        this.move(this.chosenPiece, name)
+                        this.choose(-1)
+                    } else {
+                        this.choose(-1)
+                    }
+
                 }
+            } else if (intersects.length == 0) {
+                this.choose(-1)
             }
         })
     }
@@ -127,12 +132,18 @@ class Game {
         for (let i = 0; i < board.length; i++) {
             for (let j = 0; j < board.length; j++) {
                 if (board[i][j] == 0) {
-                    let tile = new THREE.Mesh(this.tileGeometry, this.blackMaterial)
+                    let tile = new Pole(this.tileGeometry, this.blackMaterial)
                     tile.position.set(-56 + 16 * i, 0, -56 + 16 * j)
+
+                    tile.posX = -56 + 16 * j
+                    tile.posY = -56 + 16 * i
+                    tile.posI = j
+                    tile.posJ = i
+
                     tile.name = "tile_" + i + "_" + j
                     this.scene.add(tile)
                 } else if (board[i][j] == 1) {
-                    let tile = new THREE.Mesh(this.tileGeometry, this.whiteMaterial)
+                    let tile = new Pole(this.tileGeometry, this.whiteMaterial)
                     tile.position.set(-56 + 16 * i, 0, -56 + 16 * j)
                     tile.name = "tile_" + i + "_" + j
                     this.scene.add(tile)
@@ -144,17 +155,33 @@ class Game {
     }
 
     createPieces(tabPieces) {
+        let count1 = 0
+        let count2 = 0
         for (let i = 0; i < tabPieces.length; i++) {
             for (let j = 0; j < tabPieces.length; j++) {
                 if (tabPieces[i][j] == 1) {
-                    let piece = new THREE.Mesh(this.cylinderGeometry, this.whiteMaterial)
+                    let piece = new Pionek(this.cylinderGeometry, this.whiteMaterial)
                     piece.position.set(-56 + 16 * j, 2, -56 + 16 * i)
-                    piece.name = "white_" + j
+                    piece.name = "white_" + count1
+                    count1++
+
+                    piece.posX = -56 + 16 * j
+                    piece.posY = -56 + 16 * i
+                    piece.posI = i
+                    piece.posJ = j
+
                     this.scene.add(piece)
                 } else if (tabPieces[i][j] == 2) {
-                    let piece = new THREE.Mesh(this.cylinderGeometry, this.redMaterial)
+                    let piece = new Pionek(this.cylinderGeometry, this.redMaterial)
                     piece.position.set(-56 + 16 * j, 2, -56 + 16 * i)
-                    piece.name = "red_" + j
+                    piece.name = "red_" + count2
+                    count2++
+
+                    piece.posX = -56 + 16 * j
+                    piece.posY = -56 + 16 * i
+                    piece.posI = i
+                    piece.posJ = j
+
                     this.scene.add(piece)
                 }
             }
@@ -173,11 +200,12 @@ class Game {
         }
     }
 
-    choose(name) {
+    async choose(name) {
 
         // JEŚLI WYWOŁANE Z -1 TO ODZNACZA
         for (let i = 0; i < 8; i++) {
-            let obj = this.scene.getObjectByName(this.piecesColor + "_" + i)
+            let obj = await this.scene.getObjectByName(this.piecesColor + "_" + i)
+            console.log("EQEQEQEQEQEEQQEQEEEBEBEBEBEBBEBEBEBEBBEB: ", this.piecesColor + "_" + i)
             if (this.piecesColor == "red") {
                 obj.material = this.redMaterial
             } else if (this.piecesColor == "white") {
@@ -189,8 +217,27 @@ class Game {
             let piece = this.scene.getObjectByName(name)
             piece.material = this.blueMaterial
             this.chosenPiece = name
+            console.log(" YAYAYAYAYYAA : ", this.chosenPiece)
         } else {
             this.chosenPiece = ""
+        }
+    }
+
+    checkMove(pieceName, tileName) {
+        let piece = this.scene.getObjectByName(pieceName)
+        let tile = this.scene.getObjectByName(tileName)
+
+        console.log("POSITION ON BOARD > X:  ", piece.posX, " Z: ", piece.posY)
+        console.log("POSITION IN PIONKI ARR > I:  ", piece.posI, " J: ", piece.posJ)
+
+        if (this.piecesColor == "white" && tile.posI == piece.posI + 1 &&
+            (tile.posJ == piece.posJ + 1 || tile.posJ == piece.posJ - 1)) {
+            return true
+        } else if (this.piecesColor == "red" && tile.posI == piece.posI - 1 &&
+            (tile.posJ == piece.posJ + 1 || tile.posJ == piece.posJ - 1)) {
+            return true
+        } else {
+            return false
         }
     }
 
@@ -198,6 +245,60 @@ class Game {
         let piece = this.scene.getObjectByName(pieceName)
         let tile = this.scene.getObjectByName(tileName)
 
+        this.pionki[piece.posI][piece.posJ] = 0
+
         piece.position.set(tile.position.x, 2, tile.position.z)
+        piece.posX = tile.position.x
+        piece.posY = tile.position.y
+        piece.posI = tile.posI
+        piece.posJ = tile.posJ
+
+        if (this.piecesColor == "white") {
+            this.pionki[tile.posI][tile.posJ] = 1
+        } else if (this.piecesColor == "red") {
+            this.pionki[tile.posI][tile.posJ] = 2
+        } else {
+            alert("COS POSZLO NAPRAWDE NIE TAK")
+        }
+        net.emitMove(this.pionki)
+    }
+
+    updateBoard() {
+        for (let i = 0; i < 8; i++) {
+            let tempWhite = this.scene.getObjectByName("white_" + i)
+            let tempRed = this.scene.getObjectByName("red_" + i)
+
+            this.scene.remove(tempWhite)
+            this.scene.remove(tempRed)
+
+            tempWhite = null
+            tempRed = null
+        }
+
+        game.createPieces(game.pionki)
+    }
+}
+
+class Pionek extends THREE.Mesh {
+    constructor(geometry, material) {
+        super(geometry, material) // wywołanie konstruktora klasy z której dziedziczymy czyli z Mesha
+        console.log(this)
+
+        this.posI
+        this.posJ
+        this.posX
+        this.posZ
+    }
+}
+
+class Pole extends THREE.Mesh {
+    constructor(geometry, material) {
+        super(geometry, material) // wywołanie konstruktora klasy z której dziedziczymy czyli z Mesha
+        console.log(this)
+
+        this.posI
+        this.posJ
+        this.posX
+        this.posZ
     }
 }

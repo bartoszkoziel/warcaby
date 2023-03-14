@@ -37,15 +37,18 @@ class Ui {
 
                     game.createPieces(game.pionki)
                     game.status = "READY"
+                    game.token = true
                     game.refreshCamera()
                 }
             }, 1000)
         } else if (status == "USER_JOINED" && users.length == 2) {
             console.log("GAME IS READY")
+
             game.status = "READY"
             game.createPieces(game.pionki)
             game.piecesColor = "red"
             game.refreshCamera()
+            game.token = false
 
             lblLogin.style.display = "block"
             lblLogin.innerHTML = "LOGIN : " + users[1].login
