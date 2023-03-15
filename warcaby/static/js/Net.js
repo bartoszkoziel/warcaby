@@ -7,10 +7,26 @@ class Net {
             game.pionki = msg
             game.updateBoard()
 
+            this.timer
+            let time = 30
+            let divTimer = document.getElementById("timer")
+
             if (game.token == true) {
                 game.token = false
+                divTimer.innerHTML = "OPONENT'S MOVE"
             } else if (game.token == false) {
                 game.token = true
+
+                this.timer = setInterval(() => {
+                    if (time > 0) {
+                        console.log("TIME LEFT")
+                        divTimer.innerHTML = "TIME : " + time
+                        time--
+                    } else {
+                        alert("LOST")
+                        clearInterval(this.timer)
+                    }
+                }, 1000)
             }
         })
     }

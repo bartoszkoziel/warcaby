@@ -99,18 +99,19 @@ class Game {
                 if (name.split('_')[0] == this.piecesColor) {
                     this.choose(name)
 
-                    console.log("EBEBEBBEE: ", name)
-                    console.log("EBEBEBEBE: ", this.chosenPiece)
+                    // console.log("EBEBEBBEE: ", name)
+                    // console.log("EBEBEBEBE: ", this.chosenPiece)
                 }
 
                 // KLIK W POLE Z ZAZNACZONYM PIONKIEM
                 if (name.split('_')[0] == "tile" && this.chosenPiece != "") {
-                    console.log("KLIK W POLE : ", name)
-                    console.log("RUCH " + this.chosenPiece + "NA POLE : ", name)
+                    // console.log("KLIK W POLE : ", name)
+                    // console.log("RUCH " + this.chosenPiece + "NA POLE : ", name)
 
                     if (this.checkMove(this.chosenPiece, name) == true) {
                         this.move(this.chosenPiece, name)
                         this.choose(-1)
+                        clearInterval(net.timer)
                     } else {
                         this.choose(-1)
                     }
@@ -205,7 +206,6 @@ class Game {
         // JEŚLI WYWOŁANE Z -1 TO ODZNACZA
         for (let i = 0; i < 8; i++) {
             let obj = await this.scene.getObjectByName(this.piecesColor + "_" + i)
-            console.log("EQEQEQEQEQEEQQEQEEEBEBEBEBEBBEBEBEBEBBEB: ", this.piecesColor + "_" + i)
             if (this.piecesColor == "red") {
                 obj.material = this.redMaterial
             } else if (this.piecesColor == "white") {
@@ -217,7 +217,6 @@ class Game {
             let piece = this.scene.getObjectByName(name)
             piece.material = this.blueMaterial
             this.chosenPiece = name
-            console.log(" YAYAYAYAYYAA : ", this.chosenPiece)
         } else {
             this.chosenPiece = ""
         }
@@ -227,8 +226,8 @@ class Game {
         let piece = this.scene.getObjectByName(pieceName)
         let tile = this.scene.getObjectByName(tileName)
 
-        console.log("POSITION ON BOARD > X:  ", piece.posX, " Z: ", piece.posY)
-        console.log("POSITION IN PIONKI ARR > I:  ", piece.posI, " J: ", piece.posJ)
+        // console.log("POSITION ON BOARD > X:  ", piece.posX, " Z: ", piece.posY)
+        // console.log("POSITION IN PIONKI ARR > I:  ", piece.posI, " J: ", piece.posJ)
 
         if (this.piecesColor == "white" && tile.posI == piece.posI + 1 &&
             (tile.posJ == piece.posJ + 1 || tile.posJ == piece.posJ - 1)) {
@@ -247,20 +246,42 @@ class Game {
 
         this.pionki[piece.posI][piece.posJ] = 0
 
-        piece.position.set(tile.position.x, 2, tile.position.z)
-        piece.posX = tile.position.x
-        piece.posY = tile.position.y
-        piece.posI = tile.posI
-        piece.posJ = tile.posJ
-
-        if (this.piecesColor == "white") {
-            this.pionki[tile.posI][tile.posJ] = 1
-        } else if (this.piecesColor == "red") {
-            this.pionki[tile.posI][tile.posJ] = 2
-        } else {
-            alert("COS POSZLO NAPRAWDE NIE TAK")
+        let vector = {
+            x: (1 / 50) * (tile.position.x - piece.position.x),
+            z: (1 / 50) * (tile.position.z - piece.position.z)
         }
-        net.emitMove(this.pionki)
+
+        console.log("VECTRTRTRTTOOOOORORORO: ", vector)
+
+        // PODMIANA KORDOW
+
+        let i = 0
+        let smoothMvmnt = setInterval(() => {
+            if (i < 50) {
+                console.log("MAMMAIAI MMMMEMEMEMEMEMEMMEMEMEMMEMEME")
+                piece.position.set(piece.position.x + vector.x, 2, piece.position.z + vector.z)
+            } else if (i == 50) {
+                piece.position.set(tile.position.x, 2, tile.position.z)
+                clearInterval(smoothMvmnt)
+
+                piece.posX = tile.position.x
+                piece.posY = tile.position.y
+                piece.posI = tile.posI
+                piece.posJ = tile.posJ
+
+
+
+                if (this.piecesColor == "white") {
+                    this.pionki[tile.posI][tile.posJ] = 1
+                } else if (this.piecesColor == "red") {
+                    this.pionki[tile.posI][tile.posJ] = 2
+                } else {
+                    alert("COS POSZLO NAPRAWDE NIE TAK")
+                }
+                net.emitMove(this.pionki)
+            }
+            i++
+        }, 1)
     }
 
     updateBoard() {
@@ -282,7 +303,6 @@ class Game {
 class Pionek extends THREE.Mesh {
     constructor(geometry, material) {
         super(geometry, material) // wywołanie konstruktora klasy z której dziedziczymy czyli z Mesha
-        console.log(this)
 
         this.posI
         this.posJ
@@ -294,7 +314,6 @@ class Pionek extends THREE.Mesh {
 class Pole extends THREE.Mesh {
     constructor(geometry, material) {
         super(geometry, material) // wywołanie konstruktora klasy z której dziedziczymy czyli z Mesha
-        console.log(this)
 
         this.posI
         this.posJ

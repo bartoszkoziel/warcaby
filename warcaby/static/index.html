@@ -54,6 +54,16 @@
             text-shadow: -3px -3px 0 #000, 3px -3px 0 #000, -3px 3px 0 #000, 3px 3px 0 #000;
             letter-spacing: 5px;
         }
+
+        #timer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            color: red;
+            font-weight: 900;
+            font-size: 42px;
+            padding: 1em;
+        }
     </style>
 
 </head>
@@ -69,6 +79,8 @@
             <input type="button" id="btnReset" value="RESET">
         </div>
     </div>
+
+    <div id="timer"></div>
 
     <div id="waitscreen">
         <div id="msgWait">PLEASE WAIT</div>
