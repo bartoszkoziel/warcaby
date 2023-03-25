@@ -4,6 +4,7 @@ const http = require("http")
 const server = http.createServer(app)
 const { Server } = require("socket.io")
 const io = new Server(server)
+const PORT = 3000
 
 var users = []
 var IOusers = []
@@ -68,8 +69,8 @@ app.post("/handleUserCheck", (req, res) => {
 })
 
 app.use(express.static('static'))
-server.listen(3000, function () {
-    console.log("running on port 3000")
+server.listen(PORT, function () {
+    console.log("running on port ", PORT)
 })
 
 function findIndexOf(id, users) {
