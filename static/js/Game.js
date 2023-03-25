@@ -98,15 +98,10 @@ class Game {
                 // KLIK W SWOJEGO PIONKA 
                 if (name.split('_')[0] == this.piecesColor) {
                     this.choose(name)
-
-                    // console.log("EBEBEBBEE: ", name)
-                    // console.log("EBEBEBEBE: ", this.chosenPiece)
                 }
 
                 // KLIK W POLE Z ZAZNACZONYM PIONKIEM
                 if (name.split('_')[0] == "tile" && this.chosenPiece != "") {
-                    // console.log("KLIK W POLE : ", name)
-                    // console.log("RUCH " + this.chosenPiece + "NA POLE : ", name)
 
                     if (this.checkMove(this.chosenPiece, name) == "ruchBezBicia") {
                         this.move(this.chosenPiece, name)
@@ -240,9 +235,6 @@ class Game {
         let piece = this.scene.getObjectByName(pieceName)
         let tile = this.scene.getObjectByName(tileName)
 
-        // console.log("POLE_x : ", tile.posX, " POLE_z : ", tile.posZ)
-        // console.log("POLE_i : ", tile.posI, " POLE_j : ", tile.posJ)
-
 
         if (this.szachownica[tile.posI][tile.posJ] == 0 && this.pionki[tile.posI][tile.posJ] == 0) {
             // poleczarne i bez pionka
@@ -294,14 +286,11 @@ class Game {
             z: (1 / 50) * (tile.position.z - piece.position.z)
         }
 
-        console.log("VECTRTRTRTTOOOOORORORO: ", vector)
-
         // PODMIANA KORDOW
 
         let i = 0
         let smoothMvmnt = setInterval(() => {
             if (i < 50) {
-                console.log("MAMMAIAI MMMMEMEMEMEMEMEMMEMEMEMMEMEME")
                 piece.position.set(piece.position.x + vector.x, 2, piece.position.z + vector.z)
             } else if (i == 50) {
                 piece.position.set(tile.position.x, 2, tile.position.z)
